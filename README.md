@@ -1,76 +1,88 @@
 # Qrblox MCP
 
 **The Model Context Protocol server for [Qrblox](https://qrblox.com)** —
-let any MCP-aware AI agent generate and manage QR codes, audio codes,
-menus, and loyalty campaigns.
+a local stdio package so Claude Desktop, Cursor, and other agents can
+`npx` Qrblox the same way FlipLetters ships `flipletters-mcp-server`.
 
-📚 **Full reference:** [docs.qrblox.com/mcp.html](https://docs.qrblox.com/mcp.html)
-🌐 **Endpoint:** `https://app.qrblox.com/api/mcp`
-🔑 **Mint a key:** [create.qrblox.com/settings/api-keys](https://create.qrblox.com/settings/api-keys)
-🟢 **No-key sandbox:** `POST https://app.qrblox.com/api/generate-qr-code`
+This package does **not** reimplement merchant tools. It is a thin stdio
+proxy to the live Streamable HTTP MCP:
 
-> This is a public, README-only repo. The MCP server itself is
-> deployed at the endpoint above; the canonical docs live at
-> [docs.qrblox.com/mcp.html](https://docs.qrblox.com/mcp.html).
+`https://api.qrblox.com/mcp/v1` (`qrblox-mcp` 0.1.0)
 
----
-
-## What is it?
-
-`qrblox-mcp` is a JSON-RPC 2.0 MCP server. Point Claude Desktop,
-Cursor, Codex, or any MCP client at `https://app.qrblox.com/api/mcp`,
-paste in a `sk-qrblox-` key, and the assistant can immediately draft QR
-codes (and audio codes, menus, and loyalty campaigns) and read scan
-analytics on a merchant workspace.
-
-Every code created via the MCP lives on the caller's Qrblox account
-alongside codes made from the iOS, Android, Canva, and web surfaces.
+📚 **Docs:** [docs.qrblox.com/mcp.html](https://docs.qrblox.com/mcp.html)
+🔑 **Mint a key:** [app.qrblox.com/settings](https://app.qrblox.com/settings)
 
 ---
 
 ## Quick start
 
-### 1. Try it free (no signup, no OAuth)
+### 1. Mint an API key
+
+Sign in at [app.qrblox.com/settings](https://app.qrblox.com/settings)
+and create a merchant API key. Keys look like `sk-qrblox-...` and are
+shown once.
+
+Merchant `tools/call` requests send that key as
+`Authorization: Bearer sk-qrblox-...`.
+
+### 2. Run with npx
 
 ```bash
-curl -X POST https://app.qrblox.com/api/generate-qr-code \
-  -H 'content-type: application/json' \
-  -d '{"url":"https://example.com"}'
+QRBLOX_API_KEY=sk-qrblox-... npx -y qrblox-mcp
 ```
 
-Returns:
+Without `QRBLOX_API_KEY`, the process starts and exits immediately with
+a clear error pointing at the settings page.
 
-```jsonc
-{
-  "ok": true,
-  "code": {
-    "codeId": "…",
-    "destinationUrl": "https://example.com",
-    "qrImage":    "data:image/png;base64,…",            // inline PNG
-    "qrImageUrl": "https://storage.googleapis.com/…",    // hosted PNG
-    "claimToken": "…",
-    "expiresAt":  "…"
-  },
-  "upgrade": { "signup": "https://app.qrblox.com", "apiKeys": "https://create.qrblox.com/settings/api-keys" }
-}
-```
+### 3. Claude Desktop
 
-Sandbox limits: **3 codes / IP / day**, codes expire in **7 days**.
+`~/Library/Application Support/Claude/claude_desktop_config.json`
+(macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
-### 2. Mint an API key
-
-Sign in to [create.qrblox.com](https://create.qrblox.com) →
-**Settings → API keys** → **New API key**. Keys are
-`sk-qrblox-<64 hex chars>`, shown once, and revocable anytime.
-
-### 3. Connect Claude Desktop
-
-```jsonc
-// ~/Library/Application Support/Claude/claude_desktop_config.json
+```json
 {
   "mcpServers": {
     "qrblox": {
-      "url": "https://app.qrblox.com/api/mcp",
+      "command": "npx",
+      "args": ["-y", "qrblox-mcp"],
+      "env": {
+        "QRBLOX_API_KEY": "sk-qrblox-..."
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop, then ask it to generate a QR code or look up a
+voice-agent number.
+
+### 4. Cursor
+
+Add the same stdio server in Cursor MCP settings
+(`.cursor/mcp.json` or the MCP panel):
+
+```json
+{
+  "mcpServers": {
+    "qrblox": {
+      "command": "npx",
+      "args": ["-y", "qrblox-mcp"],
+      "env": {
+        "QRBLOX_API_KEY": "sk-qrblox-..."
+      }
+    }
+  }
+}
+```
+
+Clients that already speak Streamable HTTP can skip this package and
+call the remote endpoint directly:
+
+```json
+{
+  "mcpServers": {
+    "qrblox": {
+      "url": "https://api.qrblox.com/mcp/v1",
       "headers": {
         "Authorization": "Bearer sk-qrblox-..."
       }
@@ -79,106 +91,99 @@ Sign in to [create.qrblox.com](https://create.qrblox.com) →
 }
 ```
 
-Restart Claude Desktop. Then ask: *"Generate a QR code for
-https://my-spring-menu.com."*
+---
 
-### 4. Or Cursor / Codex / curl
+## Environment
 
-Same URL, same `Authorization` header.
-
-```bash
-# tools/list — no auth required
-curl -X POST https://app.qrblox.com/api/mcp \
-  -H 'content-type: application/json' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
-
-# tools/call — create a code on your account
-curl -X POST https://app.qrblox.com/api/mcp \
-  -H 'authorization: Bearer sk-qrblox-...' \
-  -H 'content-type: application/json' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call",
-       "params":{"name":"qrblox.qr.create",
-                 "arguments":{"title":"Spring menu",
-                              "destinationUrl":"https://qrblox.com/menu/spring"}}}'
-```
+| Variable | Required | Description |
+|---|---|---|
+| `QRBLOX_API_KEY` | Yes (for `tools/call`) | Merchant key `sk-qrblox-...` from [app.qrblox.com/settings](https://app.qrblox.com/settings). Sent as `Authorization: Bearer`. |
+| `QRBLOX_MCP_URL` | No | Override the remote MCP URL. Defaults to `https://api.qrblox.com/mcp/v1`. |
 
 ---
 
-## Tools
+## What the proxy does
 
-All tools are merchant-scoped and **draft-first** — agents propose,
-the merchant approves before publishing.
+1. Speaks MCP over **stdio** (what Claude Desktop / Cursor spawn).
+2. Forwards `tools/list` and `tools/call` to
+   `https://api.qrblox.com/mcp/v1` (Streamable HTTP / JSON-RPC).
+3. Attaches `Authorization: Bearer $QRBLOX_API_KEY` so merchant tools
+   run on the key owner's workspace.
+
+Tool schemas and behavior always come from the live server — this
+package is not a second implementation.
+
+### Tools (from the live server)
 
 | Tool | Description |
 |---|---|
-| `qrblox.ping` | Confirm reachability + identity. |
-| `qrblox.merchant.get_profile` | The merchant workspace attached to the key. |
-| `qrblox.qr.list` | List recent QR codes. |
-| `qrblox.qr.create` | Create a draft QR code (URL, menu, offer, campaign). |
-| `qrblox.audio.create` | Draft an audio code (near-ultrasonic payload). |
+| `qrblox.ping` | Confirm reachability + identity for the authenticated merchant. |
+| `qrblox.voice_agent.lookup` | Look up a business in the Voice Agent Phone Book by domain. |
+| `qrblox.voice_agent.register` | Register a voice-agent number for a domain. |
+| `qrblox.merchant.get_profile` | Merchant workspace attached to the key. |
+| `qrblox.qr.list` / `.create` / `.update` / `.get_analytics` | List, create, re-point, and report on QR codes. |
+| `qrblox.audio.create` | Draft an audio code. |
 | `qrblox.menu.create` / `.list` / `.add_item` | Build and extend merchant menus. |
 | `qrblox.challenge.create` | Scan streaks, scan-count games, visit-window or loyalty campaigns. |
 | `qrblox.analytics.scan_summary` | Total scans + by-day series. |
 
-Plus two REST endpoints for non-MCP callers:
-
-| Endpoint | Auth | Notes |
-|---|---|---|
-| `POST /api/generate-qr-code` | none | 3 / IP / day, sandbox, 7-day expiry. |
-| `POST /api/bulk-qr-codes` | `Bearer sk-qrblox-...` | Up to 50 permanent codes per call, written to your merchant workspace. |
+Full reference: [docs.qrblox.com/mcp.html](https://docs.qrblox.com/mcp.html).
 
 ---
 
-## Discovery
+## Local development
 
-| URL | What it returns |
-|---|---|
-| `GET https://app.qrblox.com/api/mcp` | Server info + the full tool list (no auth). |
-| `POST https://app.qrblox.com/api/mcp` `tools/list` | JSON-RPC tool discovery (no auth). |
-| `GET https://app.qrblox.com/api/generate-qr-code` | Public manifest: endpoint shape, limits, upgrade path. |
+```bash
+npm install
+npm test
+```
 
-Full reference and connect snippets at
-[**docs.qrblox.com/mcp.html**](https://docs.qrblox.com/mcp.html).
+`npm test` builds the package and runs a short check that the process
+starts and fails clearly when `QRBLOX_API_KEY` is missing.
 
----
-
-## Errors
-
-| HTTP / JSON-RPC | Meaning |
-|---|---|
-| `400 / -32600` | Invalid JSON-RPC 2.0 request. |
-| `401 / -32001` | Missing or invalid key. `data.code` = `NO_AUTH` / `INVALID_API_KEY` / `INVALID_TOKEN`. |
-| `403 / -32001` | Key revoked (`data.code` = `REVOKED`). |
-| `200 / -32601` | Unsupported method. |
-| `200 / -32602` | Unknown tool. |
-| `200 / -32000` | Tool handler threw — read `error.message`. |
+```bash
+QRBLOX_API_KEY=sk-qrblox-... npm start
+```
 
 ---
 
-## Security model
+## Publishing (maintainers)
 
-- **Merchant-scoped** — every API key is tied to one merchant
-  workspace and one owner uid; tools can't reach another merchant's
-  data.
-- **Hashed keys** — plaintext shown once; Firestore stores only a
-  SHA-256 hash and a short prefix.
-- **Audited** — every tool call writes an audit entry with the caller,
-  tool name, and status. Arguments and results are not persisted.
-- **Draft-first** — creation tools produce drafts; publishing, billing,
-  and destructive changes stay with the merchant.
+Do **not** commit tokens or keys. This package is not published from CI
+in this PR.
+
+1. Confirm the unscoped name is still free: `npm view qrblox-mcp`
+   (it was unpublished / 404 when this package was added). If it is
+   taken, change `package.json` `name` to `@qrblox/mcp` and publish
+   that instead.
+2. Sign in as the **Qrblox npm user**:
+
+   ```bash
+   npm login
+   ```
+
+3. From a clean build:
+
+   ```bash
+   npm publish
+   ```
+
+   (`prepublishOnly` runs `npm test` first.)
+
+4. Smoke-check: `npx -y qrblox-mcp` should print the missing-key error
+   until `QRBLOX_API_KEY` is set.
 
 ---
 
 ## Related
 
-- 🌐 [qrblox.com](https://qrblox.com) — marketing site
-- 🖥️ [app.qrblox.com](https://app.qrblox.com) — web dashboard
-- 📱 [iOS](https://apps.apple.com/us/app/qrblox-ai-chat-with-qr-code/id6737632062) · [Android](https://play.google.com/store/apps/details?id=com.qrblox.app) · [Canva](https://www.canva.com/apps/)
-- 📚 [Full Qrblox docs](https://docs.qrblox.com)
-- 🐙 [Terahertz-Inc/qrblox-com](https://github.com/Terahertz-Inc/qrblox-com) — Qrblox overview repo
+- 🌐 [qrblox.com](https://qrblox.com)
+- 🖥️ [app.qrblox.com](https://app.qrblox.com)
+- 📚 [docs.qrblox.com](https://docs.qrblox.com)
+- 🐙 [Terahertz-Inc/qrblox-com](https://github.com/Terahertz-Inc/qrblox-com)
 
 ---
 
 ## License
 
-© Qrblox / Terahertz Inc.
+MIT © Qrblox / Terahertz Inc.
