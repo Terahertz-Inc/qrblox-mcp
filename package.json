@@ -1,7 +1,8 @@
 {
   "name": "qrblox-mcp",
   "version": "0.1.0",
-  "description": "Stdio MCP server for Qrblox — proxies Claude, Cursor, and other agents to the live Qrblox merchant MCP.",
+  "mcpName": "com.qrblox/mcp",
+  "description": "Stdio MCP server for Qrblox \u2014 proxies Claude, Cursor, and other agents to the live Qrblox merchant MCP.",
   "keywords": [
     "mcp",
     "modelcontextprotocol",
@@ -47,5 +48,8 @@
   "devDependencies": {
     "@types/node": "^24.3.0",
     "typescript": "^5.9.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
