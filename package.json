@@ -1,0 +1,55 @@
+{
+  "name": "qrblox-mcp",
+  "version": "0.1.0",
+  "mcpName": "com.qrblox/mcp",
+  "description": "Stdio MCP server for Qrblox \u2014 proxies Claude, Cursor, and other agents to the live Qrblox merchant MCP.",
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "qrblox",
+    "qr",
+    "stdio"
+  ],
+  "homepage": "https://docs.qrblox.com/mcp.html",
+  "license": "MIT",
+  "author": {
+    "name": "Qrblox",
+    "url": "https://qrblox.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Terahertz-Inc/qrblox-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Terahertz-Inc/qrblox-mcp/issues"
+  },
+  "type": "module",
+  "bin": {
+    "qrblox-mcp": "dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node -e \"require('fs').chmodSync('dist/index.js', 0o755)\"",
+    "start": "node dist/index.js",
+    "test": "npm run build && node --test test/*.test.js",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
