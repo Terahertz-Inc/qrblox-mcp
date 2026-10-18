@@ -1,5 +1,9 @@
 # Qrblox MCP
 
+[![smithery badge](https://smithery.ai/badge/SMITHERY_NAMESPACE/qrblox)](https://smithery.ai/server/SMITHERY_NAMESPACE/qrblox)
+<!-- PLACEHOLDER: replace SMITHERY_NAMESPACE/qrblox with the qualified name Smithery assigns once the listing exists; do not merge before then. -->
+
+
 **The Model Context Protocol server for [Qrblox](https://qrblox.com)** —
 let any MCP-aware AI agent generate and manage QR codes, audio codes,
 menus, and loyalty campaigns.
