@@ -1,0 +1,43 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.qrblox/mcp",
+  "description": "Create and track QR codes, audio codes, menus, and scan analytics for a Qrblox merchant.",
+  "title": "Qrblox",
+  "repository": {
+    "url": "https://github.com/Terahertz-Inc/qrblox-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "websiteUrl": "https://docs.qrblox.com/mcp",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "qrblox-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Your sk-qrblox- API key (optional for keyless tools)",
+          "isSecret": true,
+          "name": "QRBLOX_API_KEY"
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.qrblox.com/mcp/v1",
+      "headers": [
+        {
+          "description": "Bearer token: your sk-qrblox- API key from https://app.qrblox.com/settings",
+          "isRequired": true,
+          "isSecret": true,
+          "name": "Authorization"
+        }
+      ]
+    }
+  ]
+}
