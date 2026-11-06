@@ -10,7 +10,13 @@
   "homepage": "https://qrblox.com",
   "repository": "https://github.com/Terahertz-Inc/qrblox-mcp",
   "license": "MIT",
-  "keywords": ["mcp", "qr-code", "menus", "merchants", "voice-agent"],
+  "keywords": [
+    "mcp",
+    "qr-code",
+    "menus",
+    "merchants",
+    "voice-agent"
+  ],
   "variables": {
     "type": "object",
     "properties": {
@@ -20,6 +26,9 @@
         "description": "sk-qrblox- API key from https://app.qrblox.com/settings (Bearer token)."
       }
     },
-    "required": ["QRBLOX_API_KEY"]
-  }
+    "required": [
+      "QRBLOX_API_KEY"
+    ]
+  },
+  "logo": "assets/logo.svg"
 }
