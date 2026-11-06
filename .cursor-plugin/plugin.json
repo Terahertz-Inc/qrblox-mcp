@@ -1,0 +1,25 @@
+{
+  "name": "qrblox",
+  "displayName": "Qrblox",
+  "description": "Create, update and track QR codes, audio codes and menus for merchants, plus the Voice Agent Phone Book directory.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Terahertz, Inc.",
+    "email": "support@qrblox.com"
+  },
+  "homepage": "https://qrblox.com",
+  "repository": "https://github.com/Terahertz-Inc/qrblox-mcp",
+  "license": "MIT",
+  "keywords": ["mcp", "qr-code", "menus", "merchants", "voice-agent"],
+  "variables": {
+    "type": "object",
+    "properties": {
+      "QRBLOX_API_KEY": {
+        "type": "string",
+        "title": "Qrblox API key",
+        "description": "sk-qrblox- API key from https://app.qrblox.com/settings (Bearer token)."
+      }
+    },
+    "required": ["QRBLOX_API_KEY"]
+  }
+}
