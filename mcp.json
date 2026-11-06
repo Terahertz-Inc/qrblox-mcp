@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "qrblox": {
+      "url": "https://api.qrblox.com/mcp/v1",
+      "headers": {
+        "Authorization": "Bearer ${QRBLOX_API_KEY}"
+      }
+    }
+  }
+}
