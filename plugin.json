@@ -1,0 +1,30 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "qrblox",
+  "version": "0.1.0",
+  "description": "Create, update and track QR codes, audio codes and menus for merchants, plus the Voice Agent Phone Book directory.",
+  "author": {
+    "name": "Terahertz, Inc.",
+    "email": "support@qrblox.com",
+    "url": "https://qrblox.com"
+  },
+  "homepage": "https://qrblox.com",
+  "repository": "https://github.com/Terahertz-Inc/qrblox-mcp",
+  "license": "MIT",
+  "keywords": [
+    "qrblox",
+    "qr-code",
+    "menus",
+    "merchants",
+    "mcp"
+  ],
+  "extensions": {
+    "com.nousresearch.hermes": {
+      "servers": {
+        "qrblox": {
+          "trust": "untrusted"
+        }
+      }
+    }
+  }
+}
