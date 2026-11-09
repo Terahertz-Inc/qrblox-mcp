@@ -1,0 +1,10 @@
+{
+  "name": "qrblox",
+  "version": "0.1.0",
+  "description": "Qrblox MCP: create and track QR codes, audio codes, menus, and scan analytics.",
+  "mcpServers": {
+    "qrblox": {
+      "httpUrl": "https://api.qrblox.com/mcp/v1"
+    }
+  }
+}

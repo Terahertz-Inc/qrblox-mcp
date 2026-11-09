@@ -1,5 +1,10 @@
 # Qrblox MCP
 
+[![npm](https://img.shields.io/npm/v/qrblox-mcp.svg)](https://www.npmjs.com/package/qrblox-mcp)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-listed-green)](https://registry.modelcontextprotocol.io/v0.1/servers?search=com.qrblox%2Fmcp)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+
 **The Model Context Protocol server for [Qrblox](https://qrblox.com)** —
 let any MCP-aware AI agent generate and manage QR codes, audio codes,
 menus, and loyalty campaigns.
